@@ -82,3 +82,11 @@
 2022-07-07 11:45:58,237 DEBUG   HandlerThread:31607 [handler.py:handle_request():140] handle_request: stop_status
 2022-07-07 11:45:58,238 DEBUG   SenderThread:31607 [sender.py:send_request():250] send_request: stop_status
 2022-07-07 11:45:58,633 INFO    Thread-12 :31607 [dir_watcher.py:_on_file_modified():286] file/dir modified: /home/cairs/code/amex/transformer/wandb/run-20220707_114526-3r0o3aqe/files/output.log
+2022-07-07 11:46:13,478 DEBUG   HandlerThread:31607 [handler.py:handle_request():140] handle_request: stop_status
+2022-07-07 11:46:13,479 DEBUG   SenderThread:31607 [sender.py:send_request():250] send_request: stop_status
+2022-07-07 11:46:28,726 DEBUG   HandlerThread:31607 [handler.py:handle_request():140] handle_request: stop_status
+2022-07-07 11:46:28,726 DEBUG   SenderThread:31607 [sender.py:send_request():250] send_request: stop_status
+2022-07-07 11:46:43,983 DEBUG   HandlerThread:31607 [handler.py:handle_request():140] handle_request: stop_status
+2022-07-07 11:46:43,984 DEBUG   SenderThread:31607 [sender.py:send_request():250] send_request: stop_status
+2022-07-07 11:46:54,685 INFO    MainThread:31607 [internal.py:handle_exit():80] Internal process exited
+2022-07-07 11:46:54,685 WARNING MsgRouterThr:31607 [router.py:message_loop():73] EOFError seen in message_loop

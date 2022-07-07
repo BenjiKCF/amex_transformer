@@ -1,2 +1,5 @@
 data/
+ckpt/
+wandb/
+lightning_logs/
 amex-data-for-transformers-and-rnns.zip
