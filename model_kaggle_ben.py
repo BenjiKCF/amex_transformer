@@ -117,7 +117,7 @@ class Transformer(nn.Module):
         # LAYERS
         self.embeddings = {}
         for k in range(11):
-            self.embeddings[k] = nn.Embedding(10, 4)#.to('cuda:1')
+            self.embeddings[k] = nn.Embedding(10, 4).to('cuda:0')
         feat_dim2 = feat_dim-11+11*4
         self.encoder = nn.Linear(feat_dim2, feat_dim) # bs,13,feat_dim
 
