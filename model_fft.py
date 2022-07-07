@@ -86,11 +86,23 @@ class MultiHeadAttentionBlock(nn.Module):
         x = self.fc(a)
         return x
 
+class Aug_FFT(nn.Module):
+    def __init__(self, feat_dim, embed_dim):
+        super(Aug_FFT, self).__init__()
+        self.value = QKV(feat_dim, embed_dim)
+        self.fc = nn.Linear(embed_dim, feat_dim, bias=False)
+        
+    def forward(self, x):
+        x = self.value(x)
+        x = self.fc(torch.fft.fft(torch.fft.fft(x, dim=-1), dim=-2).real)
+        return x
+
 
 class TransformerBlock(nn.Module):
     def __init__(self, embed_dim=128, feat_dim=188, num_heads=4, ff_dim=64, rate=0.1):
         super(TransformerBlock, self).__init__()
         self.att = MultiHeadAttentionBlock(feat_dim, embed_dim, num_heads)
+        self.fft = Aug_FFT(feat_dim, embed_dim)
         self.ffn = nn.Sequential(nn.Linear(feat_dim, ff_dim), nn.GELU(), nn.Linear(ff_dim, feat_dim))
         self.ln1 = nn.LayerNorm([13, feat_dim], eps=1e-6)
         self.ln2 = nn.LayerNorm([13, feat_dim], eps=1e-6)
@@ -99,8 +111,9 @@ class TransformerBlock(nn.Module):
         
     def forward(self, inputs):
         attn_output = self.att(inputs)  # inputs bs,13,188, output bs,13,188
+        fft_output = self.fft(inputs)  # inputs bs,13,188, output bs,13,188
         attn_output = self.dp1(attn_output) 
-        out1 = self.ln1(inputs+attn_output) 
+        out1 = self.ln1(inputs+attn_output+fft_output)
         ffn_output = self.ffn(out1)
         ffn_output = self.dp2(ffn_output)
         return self.ln2(out1+ffn_output)
@@ -115,8 +128,6 @@ class Transformer(nn.Module):
                         dropout_p=0.3):
         super(Transformer, self).__init__()
         # LAYERS
-        self.feat_dim=feat_dim
-        self.dropout_p = dropout_p
         self.embeddings = {}
         for k in range(11):
             self.embeddings[k] = nn.Embedding(10, 4).to('cuda:0')
@@ -133,7 +144,7 @@ class Transformer(nn.Module):
 #         self.enc_input_fc = nn.Linear(feature, embedding_size)
 #         self.enc_dropout = nn.Dropout(dropout)
         
-        self.pos = PositionalEncoding(self.feat_dim, self.dropout_p, max_len=5000)
+#         self.pos = PositionalEncoding(embedding_size)
         self.out_fc1 = nn.Linear(feat_dim, 64)
         self.out_fc2 = nn.Linear(64, 32)
         self.out_fc3 = nn.Linear(32, 1)
@@ -145,8 +156,7 @@ class Transformer(nn.Module):
             src_cat.append(self.embeddings[k](src[:,:,k].long())) #* math.sqrt(self.hidden_size)
         src_cat = torch.cat(src_cat, -1)
         src = torch.cat([src_cat, src[:,:,11:]], -1)
-        src = self.encoder(src) * math.sqrt(self.feat_dim)
-        src = self.pos(src)
+        src = self.encoder(src)
         
         # encoder
         for enc in self.encs:
