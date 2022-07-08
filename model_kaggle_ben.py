@@ -152,5 +152,5 @@ class Transformer(nn.Module):
             src = 0.9*src + 0.1*src_old
         src = F.elu(self.out_fc1(src[:,-1,:]))
         src = F.elu(self.out_fc2(src))
-        src = torch.sigmoid(self.out_fc3(src))
+        src = self.out_fc3(src)
         return src
